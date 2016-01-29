@@ -11,11 +11,6 @@ except ImportError:
 class App(object):
     def __init__(self):
         self.root = tk.Tk()
-        self.game = TicTacToePython.game.Game(self.root,\
-            onclick_back=self.back_to_mainmenu)
-
-        self.records = TicTacToePython.records.Records(self.root, \
-            onclick_back=self.back_to_mainmenu)
 
         self.menu = TicTacToePython.mainmenu.MainMenu(self.root,\
             onclick_newgame=self.onclick_newgame,\
@@ -27,11 +22,15 @@ class App(object):
     # New Game button clicked, hide mainmenu and show game
     def onclick_newgame(self):
         self.menu.pack_forget()
+        self.game = TicTacToePython.game.Game(self.root,\
+            onclick_back=self.back_to_mainmenu)
         self.game.pack()
 
     # Records button clicked, hide mainmenu and show records
     def onclick_records(self):
         self.menu.pack_forget()
+        self.records = TicTacToePython.records.Records(self.root, \
+            onclick_back=self.back_to_mainmenu)
         self.records.pack()
     
     # quit window and clean up
@@ -40,7 +39,6 @@ class App(object):
         self.root.destroy()
     
     # Go back to mainmenu from game or records
-    def back_to_mainmenu(self):
-        self.game.pack_forget()
-        self.records.pack_forget()
+    def back_to_mainmenu(self,sender):
+        sender.pack_forget()
         self.menu.pack()

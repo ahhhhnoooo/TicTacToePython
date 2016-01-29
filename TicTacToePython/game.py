@@ -1,3 +1,5 @@
+import pymongo
+import datetime
 try:
     # for Python2
     import Tkinter as tk
@@ -7,6 +9,9 @@ except ImportError:
 
 class Game(tk.Frame):
     """TicTacToe Game logic and GUI"""
+    """TODO
+        Separate into DB access (model), GUI (view) and controller
+    """
     def __init__(self,master,onclick_back=None):
         tk.Frame.__init__(self, master)
         self.blank_img = tk.PhotoImage(file="img/blank.gif")
@@ -16,7 +21,7 @@ class Game(tk.Frame):
         self.owin_img = tk.PhotoImage(file="img/owin.gif")
         self.panel = tk.Frame(self)
         self.panel.grid(row=0)
-        self.quit_btn = tk.Button(self.panel,text="Back",command=onclick_back)
+        self.quit_btn = tk.Button(self.panel,text="Back",command=lambda:onclick_back(self))
         self.quit_btn.pack(side="left")
         self.reset_btn = tk.Button(self.panel,text="Reset",command=self.reset)
         self.reset_btn.pack(side="left")
@@ -83,18 +88,34 @@ class Game(tk.Frame):
         self.duration_label.configure(text="Duration: %s"%str(self.duration))
         self.after(1000,self.ontick_duration)
 
+    # Check row for a winner
     def check_winner_row(self,p1,p2,p3):
         if(p1.value == p2.value and p2.value == p3.value):
+            # If winner, end game (stop timer), highlight winning spots, and save
             if(p1.value == "x"):
                 self.game_ended = True
                 p1.btn.configure(image=self.xwin_img)
                 p2.btn.configure(image=self.xwin_img)
                 p3.btn.configure(image=self.xwin_img)
+                self.save_record("x")
             elif(p1.value == "o"):
                 self.game_ended = True
                 p1.btn.configure(image=self.owin_img)
                 p2.btn.configure(image=self.owin_img)
                 p3.btn.configure(image=self.owin_img)
+                self.save_record("o")
+
+    def save_record(self,winner):
+        client = pymongo.MongoClient('mongodb://localhost:27017/')
+        db = client['tictactoerecordsdb']
+        colle = db['tictactoerecords']
+        game_result = {
+            "timestamp":datetime.datetime.utcnow(),
+            "duration":self.duration,
+            "winner":winner
+            }
+        colle.insert_one(game_result)
+        client.close()
 
 class BoardSpace(object):
     def __init__(self,master,index,img,onclick):
