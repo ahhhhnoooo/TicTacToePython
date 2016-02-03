@@ -1,4 +1,4 @@
-import pymongo
+import TicTacToePython.dbhelpermongo as dbhelper
 try:
     # for Python2
     import Tkinter as tk
@@ -33,10 +33,7 @@ class Records(tk.Frame):
         winner_header.grid(row=0,column=2)
 
         index = 1
-        client = pymongo.MongoClient('mongodb://localhost:27017/')
-        db = client['tictactoerecordsdb']
-        colle = db['tictactoerecords']
-        for record in colle.find():
+        for record in dbhelper.get_all_records():
             timestamp = tk.Label(self.list,text="{:%d %b %Y %H:%M:%S}".format(record["timestamp"]))
             timestamp.grid(row=index,column=0)
             duration = tk.Label(self.list,text=record["duration"])
@@ -44,12 +41,8 @@ class Records(tk.Frame):
             winner = tk.Label(self.list,text=record["winner"])
             winner.grid(row=index,column=2)
             index = index + 1
-        client.close()
 
     def onclick_clear(self):
-        client = pymongo.MongoClient('mongodb://localhost:27017/')
-        db = client['tictactoerecordsdb']
-        db['tictactoerecords'].drop()
-        client.close()
+        dbhelper.remove_all_records()
         self.list.pack_forget()
         self.populate()

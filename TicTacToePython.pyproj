@@ -25,6 +25,9 @@
     <Compile Include="TicTacToePython\app.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="TicTacToePython\dbhelpermongo.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="TicTacToePython\mainmenu.py">
       <SubType>Code</SubType>
     </Compile>

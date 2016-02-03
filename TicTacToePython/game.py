@@ -1,4 +1,4 @@
-import pymongo
+import TicTacToePython.dbhelpermongo as dbhelper
 import datetime
 try:
     # for Python2
@@ -97,25 +97,13 @@ class Game(tk.Frame):
                 p1.btn.configure(image=self.xwin_img)
                 p2.btn.configure(image=self.xwin_img)
                 p3.btn.configure(image=self.xwin_img)
-                self.save_record("x")
+                dbhelper.add_record(datetime.datetime.utcnow(),self.duration,"x")
             elif(p1.value == "o"):
                 self.game_ended = True
                 p1.btn.configure(image=self.owin_img)
                 p2.btn.configure(image=self.owin_img)
                 p3.btn.configure(image=self.owin_img)
-                self.save_record("o")
-
-    def save_record(self,winner):
-        client = pymongo.MongoClient('mongodb://localhost:27017/')
-        db = client['tictactoerecordsdb']
-        colle = db['tictactoerecords']
-        game_result = {
-            "timestamp":datetime.datetime.utcnow(),
-            "duration":self.duration,
-            "winner":winner
-            }
-        colle.insert_one(game_result)
-        client.close()
+                dbhelper.add_record(datetime.datetime.utcnow(),self.duration,"o")
 
 class BoardSpace(object):
     def __init__(self,master,index,img,onclick):
